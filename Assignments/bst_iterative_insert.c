@@ -15,8 +15,8 @@ void insert(BST *T, int value) {
     BST *trav;
 
     // Traverse down the tree until we find:
-    // - an empty spot (*trav == NULL), or
-    // - a node with the same value (do nothing in that case)
+    // - an empty spot (*trav == NULL)
+    // - or a node with the same value (ignore duplicates)
     for (trav = T; *trav != NULL && (*trav)->elem != value; ) {
         if (value < (*trav)->elem) {
             trav = &(*trav)->LC;
@@ -28,23 +28,25 @@ void insert(BST *T, int value) {
     }
 
     if (*trav == NULL) {
-        *trav = (Node*)malloc(sizeof(Node));
-        if (*trav == NULL) return;    
-        (*trav)->elem = value;
-        (*trav)->LC = (*trav)->RC = NULL;
+        Node* temp = (Node*)malloc(sizeof(Node));  
+        temp->elem = value;                        
+        temp->LC = NULL;                         
+        temp->RC = NULL;                            
+        *trav = temp;                               
     }
 }
 
 // Simple inorder traversal to show the tree contents
-void inorder(BST T) {
-    if (T != NULL) {
-        inorder(T->LC);
-        printf("%d ", T->elem);
-        inorder(T->RC);
+void inorder(BST B) {
+    if (B != NULL) {                        
+        inorder(B->LC);
+        printf("%d ", B->elem);            
+        inorder(B->RC);
     }
 }
 
 int main(void) {
+
     insert(&root, 5);
     insert(&root, 2);
     insert(&root, 8);
