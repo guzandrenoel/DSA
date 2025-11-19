@@ -11,42 +11,90 @@ typedef Node* BST;
 
 BST root = NULL;
 
+// Insert using pointer-to-pointer and loop
 void insert(BST *T, int value) {
     BST *trav;
 
-    // Traverse down the tree until we find:
-    // - an empty spot (*trav == NULL)
-    // - or a node with the same value (ignore duplicates)
     for (trav = T; *trav != NULL && (*trav)->elem != value; ) {
-        if (value < (*trav)->elem) {
-            trav = &(*trav)->LC;
-        } else if (value > (*trav)->elem) {
-            trav = &(*trav)->RC;
-        } else {
-            break;
-        }
+        if (value < (*trav)->elem) trav = &(*trav)->LC;
+        else if (value > (*trav)->elem) trav = &(*trav)->RC;
+        else break;
     }
 
     if (*trav == NULL) {
-        Node* temp = (Node*)malloc(sizeof(Node));  
-        temp->elem = value;                        
-        temp->LC = NULL;                         
-        temp->RC = NULL;                            
-        *trav = temp;                               
+        Node *temp = malloc(sizeof(Node));
+        temp->elem = value;
+        temp->LC = temp->RC = NULL;
+        *trav = temp;
     }
 }
 
-// Simple inorder traversal to show the tree contents
-void inorder(BST B) {
-    if (B != NULL) {                        
-        inorder(B->LC);
-        printf("%d ", B->elem);            
-        inorder(B->RC);
+// Iterative search
+BST search(BST T, int value) {
+    while (T != NULL && T->elem != value) {
+        if (value < T->elem) T = T->LC;
+        else T = T->RC;
+    }
+    return T;
+}
+
+// Traversals
+void inorder(BST T) {
+    if (T) {
+        inorder(T->LC);
+        printf("%d ", T->elem);
+        inorder(T->RC);
+    }
+}
+
+void preorder(BST T) {
+    if (T) {
+        printf("%d ", T->elem);
+        preorder(T->LC);
+        preorder(T->RC);
+    }
+}
+
+void postorder(BST T) {
+    if (T) {
+        postorder(T->LC);
+        postorder(T->RC);
+        printf("%d ", T->elem);
+    }
+}
+
+// Delete node from BST
+void deleteNode(BST *T, int value) {
+    BST *trav = T;
+
+    while (*trav != NULL && (*trav)->elem != value) {
+        if (value < (*trav)->elem) trav = &(*trav)->LC;
+        else trav = &(*trav)->RC;
+    }
+
+    if (*trav == NULL) return;
+
+    Node *target = *trav;
+
+    if (target->LC == NULL || target->RC == NULL) {
+        Node *child = target->LC ? target->LC : target->RC;
+        *trav = child;
+        free(target);
+    } 
+    else {
+        BST *succ = &target->RC;
+        while ((*succ)->LC != NULL) succ = &(*succ)->LC;
+
+        target->elem = (*succ)->elem;
+
+        Node *temp = *succ;
+        Node *child = temp->RC;
+        *succ = child;
+        free(temp);
     }
 }
 
 int main(void) {
-
     insert(&root, 5);
     insert(&root, 2);
     insert(&root, 8);
@@ -55,7 +103,25 @@ int main(void) {
     insert(&root, 7);
     insert(&root, 9);
 
-    printf("Inorder traversal: ");
+    printf("Inorder   : ");
+    inorder(root);
+    printf("\n");
+
+    printf("Preorder  : ");
+    preorder(root);
+    printf("\n");
+
+    printf("Postorder : ");
+    postorder(root);
+    printf("\n");
+
+    // Search example
+    BST f = search(root, 3);
+    printf("Search 3: %s\n", f ? "Found" : "Not found");
+
+    // Delete example
+    deleteNode(&root, 2);
+    printf("After deleting 2 (inorder): ");
     inorder(root);
     printf("\n");
 
