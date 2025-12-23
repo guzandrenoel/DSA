@@ -1,15 +1,10 @@
-
 #include <stdio.h>
-#include <stdlib.h>
 #include <stdbool.h>
 
 void initialize(unsigned char *set);
 void insert(unsigned char *set, int element);
 void Delete(unsigned char *set, int element);
-bool find(unsigned char *set, int element);
-unsigned char Union(unsigned char A, unsigned char B);
-unsigned char intersection(unsigned char A, unsigned char B);
-unsigned char difference(unsigned char A, unsigned char B);
+bool find(unsigned char set, int element);
 void display(unsigned char set);
 
 int main() {
@@ -22,7 +17,7 @@ int main() {
 
     Delete(&A, 1);
 
-    find(&A, 3) ? printf("found!\n") : printf("not found!\n");
+    find(A, 3) ? printf("found!\n") : printf("not found!\n");
 
     display(A);
     return 0;
@@ -34,8 +29,7 @@ void initialize(unsigned char *set){
 
 void insert(unsigned char *set, int element){
     if(element >= 0 && element < 8){
-        unsigned char mask = (unsigned char)(1 << element);
-        *set = Union(*set, mask);
+        *set |= (unsigned char)(1 << element);   // set bit
     } else {
         printf("Element size is not valid.\n");
     }
@@ -43,33 +37,17 @@ void insert(unsigned char *set, int element){
 
 void Delete(unsigned char *set, int element){
     if(element >= 0 && element < 8){
-        unsigned char mask = (unsigned char)(1 << element);
-        *set = difference(*set, mask);
+        *set &= (unsigned char)~(1 << element);  // clear bit
     } else {
         printf("Element size is not valid.\n");
     }
 }
 
-bool find(unsigned char *set, int element){
+bool find(unsigned char set, int element){
     if(element >= 0 && element < 8){
-        unsigned char mask = (unsigned char)(1 << element);
-        return (*set & mask) ? true : false;
-    } else {
-        printf("None was found.\n");
-        return false;
+        return (set & (unsigned char)(1 << element)) != 0;
     }
-}
-
-unsigned char Union(unsigned char A, unsigned char B){
-    return A | B;
-}
-
-unsigned char intersection(unsigned char A, unsigned char B){
-    return A & B;
-}
-
-unsigned char difference(unsigned char A, unsigned char B){
-    return A & (unsigned char)(~B);
+    return false;
 }
 
 void display(unsigned char set){
